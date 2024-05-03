@@ -6,8 +6,19 @@ import os
 RIOT_API_KEY = os.getenv("RIOT_API_KEY")
 
 
-def get_summoner_id(summoner_name, region="euw1"):
-    url = f"https://{region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summoner_name}?api_key={RIOT_API_KEY}"
+def get_summoner_puuid(summoner_name, tag, region="euw1"):
+    url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag}?api_key={RIOT_API_KEY}"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        summoner_data = response.json()
+        return summoner_data["puuid"]
+    else:
+        return None
+
+
+def get_summoner_id(puuid, region="euw1"):
+    url = f"https://{region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={RIOT_API_KEY}"
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -36,7 +47,7 @@ def get_summoner_rank(summoner_id, region="euw1"):
 
 def get_rank_mmr(rank: str) -> int:
     tiers_mmr = {
-        "UNRANKED": 1000,
+        "UNRANKED": 1400,
         "IRON": 500,
         "BRONZE": 750,
         "SILVER": 1000,
